@@ -8,18 +8,16 @@ import java.util.Objects;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import tocraft.walkers.impl.variant.AxolotlTypeProvider;
 import tocraft.walkers.impl.variant.CatTypeProvider;
-import tocraft.walkers.impl.variant.FoxTypeProvider;
-import tocraft.walkers.impl.variant.FrogTypeProvider;
-import tocraft.walkers.impl.variant.HorseTypeProvider;
 import tocraft.walkers.impl.variant.LlamaTypeProvider;
 import tocraft.walkers.impl.variant.ParrotTypeProvider;
 import tocraft.walkers.impl.variant.SheepTypeProvider;
@@ -37,12 +35,9 @@ public class ShapeType<T extends LivingEntity> {
 		VARIANT_BY_TYPE.put(EntityType.SHEEP, new SheepTypeProvider());
 		VARIANT_BY_TYPE.put(EntityType.AXOLOTL, new AxolotlTypeProvider());
 		VARIANT_BY_TYPE.put(EntityType.PARROT, new ParrotTypeProvider());
-		VARIANT_BY_TYPE.put(EntityType.FOX, new FoxTypeProvider());
 		VARIANT_BY_TYPE.put(EntityType.CAT, new CatTypeProvider());
 		VARIANT_BY_TYPE.put(EntityType.SLIME, new SlimeTypeProvider());
-		VARIANT_BY_TYPE.put(EntityType.FROG, new FrogTypeProvider());
 		VARIANT_BY_TYPE.put(EntityType.WOLF, new WolfTypeProvider());
-		VARIANT_BY_TYPE.put(EntityType.HORSE, new HorseTypeProvider());
 		VARIANT_BY_TYPE.put(EntityType.LLAMA, new LlamaTypeProvider());
 		VARIANT_BY_TYPE.put(EntityType.TRADER_LLAMA, new LlamaTypeProvider());
 	}
@@ -96,11 +91,11 @@ public class ShapeType<T extends LivingEntity> {
 	@Nullable
 	public static ShapeType<?> from(CompoundTag compound) {
 		ResourceLocation id = new ResourceLocation(compound.getString("EntityID"));
-		if (!BuiltInRegistries.ENTITY_TYPE.containsKey(id)) {
+		if (!Registry.ENTITY_TYPE.containsKey(id)) {
 			return null;
 		}
 
-		return new ShapeType(BuiltInRegistries.ENTITY_TYPE.get(id),
+		return new ShapeType(Registry.ENTITY_TYPE.get(id),
 				compound.contains("Variant") ? compound.getInt("Variant") : -1);
 	}
 
@@ -118,7 +113,7 @@ public class ShapeType<T extends LivingEntity> {
 
 	public CompoundTag writeCompound() {
 		CompoundTag compound = new CompoundTag();
-		compound.putString("EntityID", BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
+		compound.putString("EntityID", Registry.ENTITY_TYPE.getKey(type).toString());
 		compound.putInt("Variant", variantData);
 		return compound;
 	}
@@ -167,9 +162,9 @@ public class ShapeType<T extends LivingEntity> {
 	public Component createTooltipText(T entity) {
 		TypeProvider<T> provider = (TypeProvider<T>) VARIANT_BY_TYPE.get(type);
 		if (provider != null) {
-			return provider.modifyText(entity, Component.translatable(type.getDescriptionId()));
+			return provider.modifyText(entity, new TranslatableComponent(type.getDescriptionId()));
 		}
 
-		return Component.translatable(type.getDescriptionId());
+		return new TranslatableComponent(type.getDescriptionId());
 	}
 }

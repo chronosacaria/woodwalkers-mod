@@ -29,7 +29,7 @@ public class DevSwapPackets {
 				CompoundTag nbt = new CompoundTag();
 				nbt.putBoolean("isDev", true);
 				nbt.putString("id", id.toString());
-				ServerLevel serverWorld = ((ServerPlayer) context.getPlayer()).serverLevel();
+				ServerLevel serverWorld = ((ServerPlayer) context.getPlayer()).getLevel();
 				Entity created = EntityType.loadEntityRecursive(nbt, serverWorld, it -> it);
 
 				if (created instanceof LivingEntity living) {

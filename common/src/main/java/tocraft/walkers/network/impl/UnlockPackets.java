@@ -3,7 +3,7 @@ package tocraft.walkers.network.impl;
 import org.jetbrains.annotations.Nullable;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,7 +46,7 @@ public class UnlockPackets {
 
 			boolean validType = buf.readBoolean();
 			if (validType) {
-				EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(buf.readResourceLocation());
+				EntityType<?> entityType = Registry.ENTITY_TYPE.get(buf.readResourceLocation());
 				int variant = buf.readInt();
 
 				context.getPlayer().getServer().execute(() -> {
@@ -57,7 +57,7 @@ public class UnlockPackets {
 						PlayerShapeChanger.change2ndShape((ServerPlayer) context.getPlayer(), type);
 						// update Player
 						PlayerShape.updateShapes((ServerPlayer) context.getPlayer(), type,
-								type.create(context.getPlayer().level()));
+								type.create(context.getPlayer().level));
 					}
 
 					// Refresh player dimensions
@@ -102,7 +102,7 @@ public class UnlockPackets {
 
 		packet.writeBoolean(type != null);
 		if (type != null) {
-			packet.writeResourceLocation(BuiltInRegistries.ENTITY_TYPE.getKey(type.getEntityType()));
+			packet.writeResourceLocation(Registry.ENTITY_TYPE.getKey(type.getEntityType()));
 			packet.writeInt(type.getVariantData());
 		}
 

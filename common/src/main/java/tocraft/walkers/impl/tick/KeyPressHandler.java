@@ -4,6 +4,8 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -59,7 +61,7 @@ public class KeyPressHandler implements ClientTickEvents.Client {
 	private void handleUnlockKey(Minecraft client) {
 		// check if player is blacklisted
 		if (Walkers.CONFIG.playerUUIDBlacklist.contains(client.player.getUUID())) {
-			client.player.displayClientMessage(Component.translatable("walkers.player_blacklisted"), true);
+			client.player.displayClientMessage(new TranslatableComponent("walkers.player_blacklisted"), true);
 			return;
 		}
 
@@ -80,18 +82,18 @@ public class KeyPressHandler implements ClientTickEvents.Client {
 
 				// Ensures, the mob isn't on the blacklist
 				if (type.getEntityType().is(WalkersEntityTags.BLACKLISTED))
-					client.player.displayClientMessage(Component.translatable("walkers.unlock_entity_blacklisted"),
+					client.player.displayClientMessage(new TranslatableComponent("walkers.unlock_entity_blacklisted"),
 							true);
 				else {
 					if (currentTimer <= 0) {
 						// unlock shape
 						UnlockPackets.sendUnlockRequest(type);
 						// send unlock message
-						Component name = Component.translatable(type.getEntityType().getDescriptionId());
-						client.player.displayClientMessage(Component.translatable("walkers.unlock_entity", name), true);
+						Component name = new TranslatableComponent(type.getEntityType().getDescriptionId());
+						client.player.displayClientMessage(new TranslatableComponent("walkers.unlock_entity", name), true);
 						currentTimer = Walkers.CONFIG.unlockTimer;
 					} else {
-						client.player.displayClientMessage(Component.translatable("walkers.unlock_progress"), true);
+						client.player.displayClientMessage(new TranslatableComponent("walkers.unlock_progress"), true);
 						currentTimer -= 1;
 					}
 				}

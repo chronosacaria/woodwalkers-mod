@@ -2,7 +2,10 @@ package tocraft.walkers.impl.variant;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.level.Level;
@@ -46,7 +49,7 @@ public class WolfTypeProvider extends TypeProvider<Wolf> {
     @Override
     public Component modifyText(Wolf wolf, MutableComponent text) {
         if (getVariantData(wolf) == 1)
-            return Component.literal(formatTypePrefix("Dev" + " ")).append(text);
+            return new TextComponent(formatTypePrefix("Dev" + " ")).append(text);
         return text;
     }
 }
