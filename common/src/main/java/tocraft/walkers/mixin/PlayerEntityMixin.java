@@ -24,13 +24,11 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Ravager;
-import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import tocraft.walkers.Walkers;
 import tocraft.walkers.api.PlayerShape;
 import tocraft.walkers.mixin.accessor.EntityAccessor;
@@ -43,12 +41,15 @@ import tocraft.walkers.registry.WalkersEntityTags;
 @Mixin(Player.class)
 public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
+	@Override
 	@Shadow
 	public abstract boolean isSpectator();
 
+	@Override
 	@Shadow
 	public abstract EntityDimensions getDimensions(Pose pose);
 
+	@Override
 	@Shadow
 	public abstract boolean isSwimming();
 
@@ -97,7 +98,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 					// Air has ran out, start drowning
 					if (this.getAirSupply() == -20) {
 						this.setAirSupply(0);
-						this.hurt(damageSources().fall(), 2.0F);
+						this.hurt(DamageSource.FALL, 2.0F);
 					}
 				} else {
 					this.setAirSupply(air + 1);
@@ -149,7 +150,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 	private void tickAmbientSounds(CallbackInfo ci) {
 		LivingEntity shape = PlayerShape.getCurrentShape((Player) (Object) this);
 
-		if (!level().isClientSide && Walkers.CONFIG.playAmbientSounds && shape instanceof Mob) {
+		if (!level.isClientSide && Walkers.CONFIG.playAmbientSounds && shape instanceof Mob) {
 			Mob mobShape = (Mob) shape;
 
 			if (this.isAlive() && this.random.nextInt(1000) < this.shape_ambientSoundChance++) {
@@ -165,10 +166,10 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 					// By default, players can not hear their own ambient noises.
 					// This is because ambient noises can be very annoying.
 					if (Walkers.CONFIG.hearSelfAmbient) {
-						this.level().playSound(null, this.getX(), this.getY(), this.getZ(), sound,
+						this.level.playSound(null, this.getX(), this.getY(), this.getZ(), sound,
 								this.getSoundSource(), volume, pitch);
 					} else {
-						this.level().playSound((Player) (Object) this, this.getX(), this.getY(), this.getZ(), sound,
+						this.level.playSound((Player) (Object) this, this.getX(), this.getY(), this.getZ(), sound,
 								this.getSoundSource(), volume, pitch);
 					}
 				}
@@ -185,12 +186,12 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 		}
 	}
 
-	@Inject(method = "getFallSounds", at = @At("HEAD"), cancellable = true)
-	private void getFallSounds(CallbackInfoReturnable<LivingEntity.Fallsounds> cir) {
+	@Inject(method = "getFallDamageSound", at = @At("HEAD"), cancellable = true)
+	private void getFallSounds(int distance, CallbackInfoReturnable<SoundEvent> cir) {
 		LivingEntity shape = PlayerShape.getCurrentShape((Player) (Object) this);
 
 		if (Walkers.CONFIG.useShapeSounds && shape != null) {
-			cir.setReturnValue(shape.getFallSounds());
+			cir.setReturnValue(((LivingEntityAccessor)shape).callGetFallDamageSound(distance));
 		}
 	}
 
@@ -200,10 +201,6 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
 		if (shape instanceof IronGolem golem) {
 			((IronGolemEntityAccessor) golem).setAttackTicksLeft(10);
-		}
-
-		if (shape instanceof Warden warden) {
-			warden.attackAnimationState.start(tickCount);
 		}
 
 		if (shape instanceof Ravager ravager) {
@@ -236,26 +233,11 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 	}
 
 	@Inject(method = "tick", at = @At("HEAD"))
-	private void tickWardenSneakingAnimation(CallbackInfo ci) {
-		LivingEntity shape = PlayerShape.getCurrentShape((Player) (Object) this);
-
-		if (shape instanceof Warden warden) {
-			if (isShiftKeyDown()) {
-				if (!warden.sniffAnimationState.isStarted()) {
-					warden.sniffAnimationState.start(tickCount);
-				}
-			} else {
-				warden.sniffAnimationState.stop();
-			}
-		}
-	}
-
-	@Inject(method = "tick", at = @At("HEAD"))
 	private void tickFire(CallbackInfo ci) {
 		Player player = (Player) (Object) this;
 		LivingEntity shape = PlayerShape.getCurrentShape(player);
 
-		if (!player.level().isClientSide && !player.isCreative() && !player.isSpectator()) {
+		if (!player.level.isClientSide && !player.isCreative() && !player.isSpectator()) {
 			// check if the player is shape
 			if (shape != null) {
 				EntityType<?> type = shape.getType();
@@ -266,7 +248,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 					if (bl) {
 
 						// Can't burn in the rain
-						if (player.level().isRaining()) {
+						if (player.level.isRaining()) {
 							return;
 						}
 
@@ -298,9 +280,9 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
 	@Unique
 	private boolean isInDaylight() {
-		if (level().isDay() && !level().isClientSide) {
-			float brightnessAtEyes = getLightLevelDependentMagicValue();
-			BlockPos daylightTestPosition = BlockPos.containing(getX(), (double) Math.round(getY()), getZ());
+		if (level.isDay() && !level.isClientSide) {
+			float brightnessAtEyes = getBrightness();
+			BlockPos daylightTestPosition = new BlockPos(getX(), Math.round(getY()), getZ());
 
 			// move test position up one block for boats
 			if (getVehicle() instanceof Boat) {
@@ -308,7 +290,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 			}
 
 			return brightnessAtEyes > 0.5F && random.nextFloat() * 30.0F < (brightnessAtEyes - 0.4F) * 2.0F
-					&& level().canSeeSky(daylightTestPosition);
+					&& level.canSeeSky(daylightTestPosition);
 		}
 
 		return false;
@@ -327,9 +309,8 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 				// damage player if they are an shape that gets hurt by high temps (eg. snow
 				// golem in nether)
 				if (type.is(WalkersEntityTags.HURT_BY_HIGH_TEMPERATURE)) {
-					Biome biome = level().getBiome(blockPosition()).value();
-					if (!biome.coldEnoughToSnow(blockPosition())) {
-						player.hurt(level().damageSources().onFire(), 1.0f);
+					if(player.level.getBiome(new BlockPos(player.getX(), 0, player.getZ())).getTemperature(new BlockPos(player.getX(), player.getY(), player.getZ())) > 1.0F) {
+						player.hurt(DamageSource.ON_FIRE, 1.0f);
 					}
 				}
 			}
@@ -338,7 +319,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
 	@Inject(method = "tick", at = @At("HEAD"))
 	private void tickWalkers(CallbackInfo ci) {
-		if (!level().isClientSide) {
+		if (!level.isClientSide) {
 			Player player = (Player) (Object) this;
 			LivingEntity shape = PlayerShape.getCurrentShape(player);
 

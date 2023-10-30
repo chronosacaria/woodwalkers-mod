@@ -2,6 +2,7 @@ package tocraft.walkers.impl.variant;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.level.Level;
@@ -34,6 +35,6 @@ public class SlimeTypeProvider extends TypeProvider<Slime> {
 
     @Override
     public Component modifyText(Slime entity, MutableComponent text) {
-        return Component.literal(String.format("Size %d ", entity.getSize())).append(text);
+        return new TextComponent(String.format("Size %d ", entity.getSize())).append(text);
     }
 }

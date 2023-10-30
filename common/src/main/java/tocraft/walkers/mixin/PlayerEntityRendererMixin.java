@@ -17,8 +17,8 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -42,7 +42,6 @@ import tocraft.walkers.api.model.EntityArms;
 import tocraft.walkers.api.model.EntityUpdater;
 import tocraft.walkers.api.model.EntityUpdaters;
 import tocraft.walkers.mixin.accessor.EntityAccessor;
-import tocraft.walkers.mixin.accessor.LimbAnimatorAccessor;
 import tocraft.walkers.mixin.accessor.LivingEntityAccessor;
 import tocraft.walkers.mixin.accessor.LivingEntityRendererAccessor;
 
@@ -55,7 +54,7 @@ public abstract class PlayerEntityRendererMixin
 		return null;
 	}
 
-	private PlayerEntityRendererMixin(EntityRendererProvider.Context ctx, PlayerModel<AbstractClientPlayer> model,
+	private PlayerEntityRendererMixin(EntityRenderDispatcher ctx, PlayerModel<AbstractClientPlayer> model,
 			float shadowRadius) {
 		super(ctx, model, shadowRadius);
 	}
@@ -67,10 +66,9 @@ public abstract class PlayerEntityRendererMixin
 
 		// sync player data to shape
 		if (shape != null) {
-			((LimbAnimatorAccessor) shape.walkAnimation)
-					.setPrevSpeed(((LimbAnimatorAccessor) player.walkAnimation).getPrevSpeed());
-			shape.walkAnimation.setSpeed(player.walkAnimation.speed());
-			((LimbAnimatorAccessor) shape.walkAnimation).setPos(player.walkAnimation.position());
+			shape.animationSpeedOld = player.animationSpeedOld;
+			shape.animationSpeed = player.animationSpeed;
+			shape.animationPosition = player.animationPosition;
 			shape.swinging = player.swinging;
 			shape.swingTime = player.swingTime;
 			shape.oAttackAnim = player.oAttackAnim;
@@ -81,7 +79,7 @@ public abstract class PlayerEntityRendererMixin
 			shape.yHeadRotO = player.yHeadRotO;
 			shape.tickCount = player.tickCount;
 			shape.swingingArm = player.swingingArm;
-			shape.setOnGround(player.onGround());
+			shape.setOnGround(player.isOnGround());
 			shape.setDeltaMovement(player.getDeltaMovement());
 
 			((EntityAccessor) shape).setVehicle(player.getVehicle());
@@ -89,10 +87,10 @@ public abstract class PlayerEntityRendererMixin
 
 			// phantoms' pitch is inverse for whatever reason
 			if (shape instanceof Phantom) {
-				shape.setXRot(-player.getXRot());
+				shape.xRot = -player.xRot;
 				shape.xRotO = -player.xRotO;
 			} else {
-				shape.setXRot(player.getXRot());
+				shape.xRot = player.xRot;
 				shape.xRotO = player.xRotO;
 			}
 

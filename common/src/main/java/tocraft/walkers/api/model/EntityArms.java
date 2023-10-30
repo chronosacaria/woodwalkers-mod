@@ -120,8 +120,8 @@ public class EntityArms {
 
 	public static void init() {
 		// specific
-		register(LlamaModel.class, (llama, model) -> ((LlamaEntityModelAccessor) model).getRightFrontLeg());
-		register(PandaModel.class, (llama, model) -> ((QuadrupedEntityModelAccessor) model).getRightFrontLeg(),
+		register(LlamaModel.class, (llama, model) -> ((LlamaEntityModelAccessor) model).getLeg1());
+		register(PandaModel.class, (llama, model) -> ((QuadrupedEntityModelAccessor) model).getLeg1(),
 				(stack, model) -> stack.translate(0, -0.5, 0));
 		register(BlazeModel.class, (llama, model) -> ((BlazeEntityModelAccessor) model).getUpperBodyParts()[10],
 				(stack, model) -> {
@@ -130,8 +130,8 @@ public class EntityArms {
 					stack.mulPose(math.getDegreesQuaternion(math.POSITIVE_X(), -25));
 					stack.translate(0, 0, -.25);
 				});
-		register(OcelotModel.class, (ocelot, model) -> ((OcelotEntityModelAccessor) model).getRightFrontLeg());
-		register(SpiderModel.class, (spider, model) -> ((SpiderEntityModelAccessor) model).getRightFrontLeg(),
+		register(OcelotModel.class, (ocelot, model) -> ((OcelotEntityModelAccessor) model).getFrontLegR());
+		register(SpiderModel.class, (spider, model) -> ((SpiderEntityModelAccessor) model).getLeg1(),
 				(stack, model) -> {
 					stack.mulPose(math.getDegreesQuaternion(math.POSITIVE_Y(), -15));
 					stack.mulPose(math.getDegreesQuaternion(math.POSITIVE_X(), 15));
@@ -140,19 +140,19 @@ public class EntityArms {
 		register(IronGolemModel.class, (golem, model) -> model.getFlowerHoldingArm(), (stack, model) -> {
 			stack.translate(0, 0, -.5);
 		});
-		register(PigModel.class, (pig, model) -> ((QuadrupedEntityModelAccessor) model).getRightFrontLeg(),
+		register(PigModel.class, (pig, model) -> ((QuadrupedEntityModelAccessor) model).getLeg1(),
 				(stack, model) -> {
 					stack.translate(0, 0, .6);
 				});
-		register(PolarBearModel.class, (bear, model) -> ((QuadrupedEntityModelAccessor) model).getRightFrontLeg(),
+		register(PolarBearModel.class, (bear, model) -> ((QuadrupedEntityModelAccessor) model).getLeg1(),
 				(stack, model) -> {
 					stack.translate(0, 0, .3);
 				});
-		register(RavagerModel.class, (bear, model) -> ((RavagerEntityModelAccessor) model).getRightFrontLeg());
+		register(RavagerModel.class, (bear, model) -> ((RavagerEntityModelAccessor) model).getLeg1());
 		register(SquidModel.class, (squid, model) -> ((SquidEntityModelAccessor) model).getTentacles()[0]);
 
 		// generic
-		register(QuadrupedModel.class, (quad, model) -> ((QuadrupedEntityModelAccessor) model).getRightFrontLeg());
+		register(QuadrupedModel.class, (quad, model) -> ((QuadrupedEntityModelAccessor) model).getLeg1());
 
 		// types
 		register(EntityType.PILLAGER, (pillager, model) -> ((IllagerEntityModelAccessor) model).getRightArm(),

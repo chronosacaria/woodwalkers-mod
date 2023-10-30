@@ -18,7 +18,6 @@ import tocraft.walkers.api.PlayerShape;
 
 @Mixin(VillagerHostilesSensor.class)
 public class VillagerHostilesSensorMixin {
-	private boolean lol = false;
 
 	@Shadow
 	@Final
@@ -50,7 +49,7 @@ public class VillagerHostilesSensorMixin {
 			// check if shape is valid & if it is a type villagers run from
 			if (shape != null && ACCEPTABLE_DISTANCE_FROM_HOSTILES.containsKey(shape.getType())) {
 				float f = ACCEPTABLE_DISTANCE_FROM_HOSTILES.get(shape.getType());
-				cir.setReturnValue(potentialPlayer.distanceToSqr(villager) <= (double) (f * f));
+				cir.setReturnValue(potentialPlayer.distanceToSqr(villager) <= f * f);
 			} else {
 				cir.setReturnValue(false);
 			}

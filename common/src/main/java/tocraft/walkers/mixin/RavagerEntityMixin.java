@@ -1,5 +1,7 @@
 package tocraft.walkers.mixin;
 
+import org.spongepowered.asm.mixin.Mixin;
+
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -7,7 +9,6 @@ import net.minecraft.world.entity.monster.Ravager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(Ravager.class)
 public abstract class RavagerEntityMixin extends LivingEntity {
@@ -23,16 +24,16 @@ public abstract class RavagerEntityMixin extends LivingEntity {
 
             // Ensure Ravager has a passenger
             if (isVehicle()) {
-                LivingEntity rider = (LivingEntity) getFirstPassenger();
+                LivingEntity rider = (LivingEntity) getControllingPassenger();
 
                 // Only players should be able to control Ravager
                 if (rider instanceof Player) {
                     // Assign rider properties to ravager
-                    this.setYRot(rider.getYRot());
-                    this.yRotO = this.getYRot();
-                    this.setXRot(rider.getXRot() * 0.5F);
-                    this.setRot(this.getYRot(), this.getXRot());
-                    this.yBodyRot = this.getYRot();
+                    this.yRotO = rider.yRotO;
+                    this.yRotO = rider.yRotO;
+                    this.xRotO = rider.xRotO * 0.5F;
+                    this.setRot(this.yRotO, this.xRotO);
+                    this.yBodyRot = this.yRotO;
                     this.yHeadRot = this.yBodyRot;
                     float sidewaysSpeed = rider.xxa * 0.5F;
                     float forwardSpeed = rider.zza;
@@ -51,7 +52,7 @@ public abstract class RavagerEntityMixin extends LivingEntity {
                     }
 
                     // Limb updates for movement
-                    this.calculateEntityAnimation(false);
+                    this.calculateEntityAnimation(this, false);
                     return;
                 }
             }

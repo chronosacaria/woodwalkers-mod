@@ -12,13 +12,13 @@ public class TropicalFishTypeProvider extends TypeProvider<TropicalFish> {
 
     @Override
     public int getVariantData(TropicalFish entity) {
-        return entity.getVariant().getPackedId();
+        return entity.getVariant();
     }
 
     @Override
     public TropicalFish create(EntityType<TropicalFish> type, Level world, int data) {
         TropicalFish fish = new TropicalFish(type, world);
-        fish.setVariant(TropicalFish.getPattern(data));
+        fish.setVariant(data);
         return fish;
     }
 

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,6 +32,7 @@ import tocraft.walkers.impl.DimensionsRefresher;
 import tocraft.walkers.impl.PlayerDataProvider;
 import tocraft.walkers.mixin.EntityTrackerAccessor;
 import tocraft.walkers.mixin.ThreadedAnvilChunkStorageAccessor;
+import tocraft.walkers.mixin.accessor.PlayerEntityAccessor;
 import tocraft.walkers.registry.WalkersEntityTags;
 
 @Mixin(Player.class)
@@ -108,7 +109,7 @@ public abstract class PlayerEntityDataMixin extends LivingEntity implements Play
 		// put entity type ID under the key "id", or "minecraft:empty" if no shape is
 		// equipped (or the shape entity type is invalid)
 		tag.putString("id",
-				shape == null ? "minecraft:empty" : BuiltInRegistries.ENTITY_TYPE.getKey(shape.getType()).toString());
+				shape == null ? "minecraft:empty" : Registry.ENTITY_TYPE.getKey(shape.getType()).toString());
 		tag.put("EntityData", entityTag);
 		return tag;
 	}
@@ -130,7 +131,7 @@ public abstract class PlayerEntityDataMixin extends LivingEntity implements Play
 			// ensure entity data exists
 			if (entityTag != null) {
 				if (shape == null || !type.get().equals(shape.getType())) {
-					shape = (LivingEntity) type.get().create(level());
+					shape = (LivingEntity) type.get().create(level);
 
 					// refresh player dimensions/hitbox on client
 					((DimensionsRefresher) this).shape_refreshDimensions();
@@ -261,11 +262,11 @@ public abstract class PlayerEntityDataMixin extends LivingEntity implements Play
 		ServerPlayer serverPlayer = (ServerPlayer) player;
 		if (Walkers.hasFlyingPermissions((ServerPlayer) player)) {
 			FlightHelper.grantFlightTo(serverPlayer);
-			player.getAbilities().setFlyingSpeed(Walkers.CONFIG.flySpeed);
+			((PlayerEntityAccessor) player).getAbilities().setFlyingSpeed(Walkers.CONFIG.flySpeed);
 			player.onUpdateAbilities();
 		} else {
 			FlightHelper.revokeFlight(serverPlayer);
-			player.getAbilities().setFlyingSpeed(0.05f);
+			((PlayerEntityAccessor) player).getAbilities().setFlyingSpeed(0.05f);
 			player.onUpdateAbilities();
 		}
 
@@ -277,14 +278,14 @@ public abstract class PlayerEntityDataMixin extends LivingEntity implements Play
 		}
 
 		// sync with client
-		if (!player.level().isClientSide) {
+		if (!player.level.isClientSide) {
 			PlayerShape.sync((ServerPlayer) player);
 
-			Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor) ((ServerLevel) player.level())
+			Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor) ((ServerLevel) player.level)
 					.getChunkSource().chunkMap).getEntityMap();
 			Object tracking = trackers.get(player.getId());
 			((EntityTrackerAccessor) tracking).getSeenBy().forEach(listener -> {
-				PlayerShape.sync((ServerPlayer) player, listener.getPlayer());
+				PlayerShape.sync((ServerPlayer) player, listener);
 			});
 		}
 

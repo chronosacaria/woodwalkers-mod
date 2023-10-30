@@ -13,7 +13,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import tocraft.walkers.Walkers;
 import tocraft.walkers.impl.NearbySongAccessor;
 import tocraft.walkers.mixin.accessor.CreeperEntityAccessor;
 import tocraft.walkers.mixin.accessor.ParrotEntityAccessor;
@@ -69,7 +68,7 @@ public class EntityUpdaters {
 	public static void init() {
 		// register specific entity animation handling
 		EntityUpdaters.register(EntityType.BAT, (player, bat) -> {
-			if (player.onGround()) {
+			if (player.isOnGround()) {
 				bat.setResting(true);
 			} else {
 				bat.setResting(false);
@@ -77,11 +76,11 @@ public class EntityUpdaters {
 		});
 
 		EntityUpdaters.register(EntityType.PARROT, (player, parrot) -> {
-			if (player.onGround() && ((NearbySongAccessor) player).shape_isNearbySongPlaying()) {
+			if (player.isOnGround() && ((NearbySongAccessor) player).shape_isNearbySongPlaying()) {
 				parrot.setRecordPlayingNearby(player.blockPosition(), true);
 				parrot.setOrderedToSit(true);
 				parrot.setOnGround(true);
-			} else if (player.onGround()) {
+			} else if (player.isOnGround()) {
 				parrot.setRecordPlayingNearby(player.blockPosition(), false);
 				parrot.setOrderedToSit(true);
 				parrot.setOnGround(true);
@@ -105,7 +104,7 @@ public class EntityUpdaters {
 			// setting yaw without +180 making tail faces front, for some reason
 			if (dragon.posPointer < 0) {
 				for (int l = 0; l < dragon.positions.length; ++l) {
-					dragon.positions[l][0] = (double) player.getYRot() + 180;
+					dragon.positions[l][0] = (double) player.yRotO + 180;
 					dragon.positions[l][1] = player.getY();
 				}
 			}
@@ -114,7 +113,7 @@ public class EntityUpdaters {
 				(dragon).posPointer = 0;
 			}
 
-			dragon.positions[dragon.posPointer][0] = (double) player.getYRot() + 180;
+			dragon.positions[dragon.posPointer][0] = (double) player.yRotO + 180;
 			dragon.positions[dragon.posPointer][1] = player.getY();
 		});
 
@@ -148,7 +147,6 @@ public class EntityUpdaters {
 			 * squid.getRotationClient() == new Vec2f(0F, 0F)) { squid.tickMovement(); }
 			 * else
 			 */
-			Walkers.LOGGER.warn("pitch: " + squid.getXRot() + ". yaw: " + squid.getVisualRotationYInDegrees());
 		});
 	}
 }

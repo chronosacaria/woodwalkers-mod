@@ -1,8 +1,10 @@
 package tocraft.walkers.impl.variant;
 
 import com.google.common.collect.ImmutableMap;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Parrot;
 import net.minecraft.world.level.Level;
@@ -21,13 +23,13 @@ public class ParrotTypeProvider extends TypeProvider<Parrot> {
 
     @Override
     public int getVariantData(Parrot entity) {
-        return entity.getVariant().getId();
+        return entity.getVariant();
     }
 
     @Override
     public Parrot create(EntityType<Parrot> type, Level world, int data) {
         Parrot parrot = new Parrot(type, world);
-        parrot.setVariant(Parrot.Variant.byId(data));
+        parrot.setVariant(data);
         return parrot;
     }
 
@@ -44,6 +46,6 @@ public class ParrotTypeProvider extends TypeProvider<Parrot> {
     @Override
     public Component modifyText(Parrot parrot, MutableComponent text) {
         int variant = getVariantData(parrot);
-        return Component.literal(PREFIX_BY_ID.containsKey(variant) ? PREFIX_BY_ID.get(variant) + " " : "").append(text);
+        return new TextComponent(PREFIX_BY_ID.containsKey(variant) ? PREFIX_BY_ID.get(variant) + " " : "").append(text);
     }
 }

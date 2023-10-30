@@ -3,15 +3,15 @@ package tocraft.walkers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,9 +37,9 @@ import tocraft.walkers.registry.WalkersEventHandlers;
 
 public class Walkers {
 
-	public static final Logger LOGGER = LoggerFactory.getLogger(Walkers.class);
+	public static final Logger LOGGER = LogManager.getLogger(Walkers.class);
 	public static final String MODID = "walkers";
-	public static String versionURL = "https://raw.githubusercontent.com/ToCraft/woodwalkers-mod/1.20.2/gradle.properties";
+	public static String versionURL = "https://raw.githubusercontent.com/ToCraft/woodwalkers-mod/1.16.5/gradle.properties";
 	public static final WalkersConfig CONFIG = ConfigLoader.read(MODID, WalkersConfig.class);
 	public static List<String> devs = new ArrayList<>();
 
@@ -48,6 +48,7 @@ public class Walkers {
 	}
 
 	public void initialize() {
+		WalkersEntityTags.init();
 		AbilityRegistry.init();
 		WalkersEventHandlers.initialize();
 		WalkersCommands.init();
@@ -66,13 +67,13 @@ public class Walkers {
 			@Nullable
 			String newVersion = VersionChecker.checkForNewVersion(versionURL);
 			if (newVersion != null && !Platform.getMod(MODID).getVersion().equals(newVersion))
-				player.sendSystemMessage(Component.translatable("walkers.update", newVersion));
+				player.displayClientMessage(new TranslatableComponent("walkers.update", newVersion), false);
 
-			Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor) ((ServerLevel) player.level())
+			Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor) ((ServerLevel) player.level)
 					.getChunkSource().chunkMap).getEntityMap();
 			trackers.forEach((entityid, tracking) -> {
-				if (((ServerLevel) player.level()).getEntity(entityid) instanceof ServerPlayer)
-					PlayerShape.sync(((ServerPlayer) player.serverLevel().getEntity(entityid)), player);
+				if (((ServerLevel) player.level).getEntity(entityid) instanceof ServerPlayer)
+					PlayerShape.sync(((ServerPlayer) ((ServerLevel) player.level).getEntity(entityid)), player);
 			});
 		});
 	}
@@ -93,7 +94,7 @@ public class Walkers {
 
 				boolean hasPermission = true;
 				for (String requiredAdvancement : requiredAdvancements) {
-					AdvancementHolder advancement = player.server.getAdvancements().get(new ResourceLocation(requiredAdvancement));
+					Advancement advancement = player.server.getAdvancements().getAdvancement(new ResourceLocation(requiredAdvancement));
 					AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
 
 					if (!progress.isDone()) {
@@ -115,7 +116,7 @@ public class Walkers {
 	}
 
 	public static int getCooldown(EntityType<?> type) {
-		String id = BuiltInRegistries.ENTITY_TYPE.getKey(type).toString();
+		String id = Registry.ENTITY_TYPE.getKey(type).toString();
 		return Walkers.CONFIG.abilityCooldownMap.getOrDefault(id, 20);
 	}
 }

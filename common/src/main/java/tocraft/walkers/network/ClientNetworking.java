@@ -69,7 +69,7 @@ public class ClientNetworking implements NetworkHandler {
 
 						// ensure entity data exists
 						if (shape == null || !type.get().equals(shape.getType())) {
-							shape = (LivingEntity) type.get().create(syncTarget.level());
+							shape = (LivingEntity) type.get().create(syncTarget.level);
 							data.setCurrentShape(shape);
 
 							// refresh player dimensions/hitbox on client
@@ -77,7 +77,11 @@ public class ClientNetworking implements NetworkHandler {
 						}
 
 						if (shape != null) {
-							shape.load(entityNbt);
+							// probably crashes, prevent console from being spammed with errors
+							try {
+								shape.load(entityNbt);
+							}
+							catch (Exception ignored) {};
 						}
 					}
 				}

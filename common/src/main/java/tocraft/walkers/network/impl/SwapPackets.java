@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import tocraft.craftedcore.network.NetworkManager;
@@ -22,7 +22,7 @@ public class SwapPackets {
 				context.getPlayer().getServer().execute(() -> {
 					// check if player is blacklisted
 					if (Walkers.CONFIG.playerUUIDBlacklist.contains(context.getPlayer().getUUID())) {
-						context.getPlayer().displayClientMessage(Component.translatable("walkers.player_blacklisted"), true);
+						context.getPlayer().displayClientMessage(new TranslatableComponent("walkers.player_blacklisted"), true);
 						return;
 					}
 					
@@ -38,7 +38,7 @@ public class SwapPackets {
 					if (type != null) {
 						// update Player
 						PlayerShape.updateShapes((ServerPlayer) context.getPlayer(), type,
-								type.create(context.getPlayer().level()));
+								type.create(context.getPlayer().level));
 					}
 					else {
 						// Swap back to player if server allows it

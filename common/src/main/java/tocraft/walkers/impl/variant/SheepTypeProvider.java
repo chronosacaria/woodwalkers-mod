@@ -2,6 +2,7 @@ package tocraft.walkers.impl.variant;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.item.DyeColor;
@@ -34,6 +35,6 @@ public class SheepTypeProvider extends TypeProvider<Sheep> {
 
     @Override
     public Component modifyText(Sheep sheep, MutableComponent text) {
-        return Component.literal(formatTypePrefix(DyeColor.byId(getVariantData(sheep)).getName()) + " ").append(text);
+        return new TextComponent(formatTypePrefix(DyeColor.byId(getVariantData(sheep)).getName()) + " ").append(text);
     }
 }
