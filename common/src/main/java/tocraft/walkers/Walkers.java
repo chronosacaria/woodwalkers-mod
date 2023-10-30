@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -39,7 +39,7 @@ public class Walkers {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(Walkers.class);
 	public static final String MODID = "walkers";
-	public static String versionURL = "https://raw.githubusercontent.com/ToCraft/woodwalkers-mod/1.20.2/gradle.properties";
+	public static String versionURL = "https://raw.githubusercontent.com/ToCraft/woodwalkers-mod/1.19.4/gradle.properties";
 	public static final WalkersConfig CONFIG = ConfigLoader.read(MODID, WalkersConfig.class);
 	public static List<String> devs = new ArrayList<>();
 
@@ -68,11 +68,11 @@ public class Walkers {
 			if (newVersion != null && !Platform.getMod(MODID).getVersion().equals(newVersion))
 				player.sendSystemMessage(Component.translatable("walkers.update", newVersion));
 
-			Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor) ((ServerLevel) player.level())
+			Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor) ((ServerLevel) player.level)
 					.getChunkSource().chunkMap).getEntityMap();
 			trackers.forEach((entityid, tracking) -> {
-				if (((ServerLevel) player.level()).getEntity(entityid) instanceof ServerPlayer)
-					PlayerShape.sync(((ServerPlayer) player.serverLevel().getEntity(entityid)), player);
+				if (((ServerLevel) player.level).getEntity(entityid) instanceof ServerPlayer)
+					PlayerShape.sync(((ServerPlayer) ((ServerLevel) player.level).getEntity(entityid)), player);
 			});
 		});
 	}
@@ -93,7 +93,8 @@ public class Walkers {
 
 				boolean hasPermission = true;
 				for (String requiredAdvancement : requiredAdvancements) {
-					AdvancementHolder advancement = player.server.getAdvancements().get(new ResourceLocation(requiredAdvancement));
+					Advancement advancement = player.server.getAdvancements()
+							.getAdvancement(new ResourceLocation(requiredAdvancement));
 					AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
 
 					if (!progress.isDone()) {

@@ -130,7 +130,7 @@ public abstract class PlayerEntityDataMixin extends LivingEntity implements Play
 			// ensure entity data exists
 			if (entityTag != null) {
 				if (shape == null || !type.get().equals(shape.getType())) {
-					shape = (LivingEntity) type.get().create(level());
+					shape = (LivingEntity) type.get().create(level);
 
 					// refresh player dimensions/hitbox on client
 					((DimensionsRefresher) this).shape_refreshDimensions();
@@ -277,10 +277,10 @@ public abstract class PlayerEntityDataMixin extends LivingEntity implements Play
 		}
 
 		// sync with client
-		if (!player.level().isClientSide) {
+		if (!player.level.isClientSide) {
 			PlayerShape.sync((ServerPlayer) player);
 
-			Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor) ((ServerLevel) player.level())
+			Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor) ((ServerLevel) player.level)
 					.getChunkSource().chunkMap).getEntityMap();
 			Object tracking = trackers.get(player.getId());
 			((EntityTrackerAccessor) tracking).getSeenBy().forEach(listener -> {

@@ -149,7 +149,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 	private void tickAmbientSounds(CallbackInfo ci) {
 		LivingEntity shape = PlayerShape.getCurrentShape((Player) (Object) this);
 
-		if (!level().isClientSide && Walkers.CONFIG.playAmbientSounds && shape instanceof Mob) {
+		if (!level.isClientSide && Walkers.CONFIG.playAmbientSounds && shape instanceof Mob) {
 			Mob mobShape = (Mob) shape;
 
 			if (this.isAlive() && this.random.nextInt(1000) < this.shape_ambientSoundChance++) {
@@ -165,10 +165,10 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 					// By default, players can not hear their own ambient noises.
 					// This is because ambient noises can be very annoying.
 					if (Walkers.CONFIG.hearSelfAmbient) {
-						this.level().playSound(null, this.getX(), this.getY(), this.getZ(), sound,
+						this.level.playSound(null, this.getX(), this.getY(), this.getZ(), sound,
 								this.getSoundSource(), volume, pitch);
 					} else {
-						this.level().playSound((Player) (Object) this, this.getX(), this.getY(), this.getZ(), sound,
+						this.level.playSound((Player) (Object) this, this.getX(), this.getY(), this.getZ(), sound,
 								this.getSoundSource(), volume, pitch);
 					}
 				}
@@ -255,7 +255,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 		Player player = (Player) (Object) this;
 		LivingEntity shape = PlayerShape.getCurrentShape(player);
 
-		if (!player.level().isClientSide && !player.isCreative() && !player.isSpectator()) {
+		if (!player.level.isClientSide && !player.isCreative() && !player.isSpectator()) {
 			// check if the player is shape
 			if (shape != null) {
 				EntityType<?> type = shape.getType();
@@ -266,7 +266,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 					if (bl) {
 
 						// Can't burn in the rain
-						if (player.level().isRaining()) {
+						if (player.level.isRaining()) {
 							return;
 						}
 
@@ -298,7 +298,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
 	@Unique
 	private boolean isInDaylight() {
-		if (level().isDay() && !level().isClientSide) {
+		if (level.isDay() && !level.isClientSide) {
 			float brightnessAtEyes = getLightLevelDependentMagicValue();
 			BlockPos daylightTestPosition = BlockPos.containing(getX(), (double) Math.round(getY()), getZ());
 
@@ -308,7 +308,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 			}
 
 			return brightnessAtEyes > 0.5F && random.nextFloat() * 30.0F < (brightnessAtEyes - 0.4F) * 2.0F
-					&& level().canSeeSky(daylightTestPosition);
+					&& level.canSeeSky(daylightTestPosition);
 		}
 
 		return false;
@@ -327,9 +327,9 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 				// damage player if they are an shape that gets hurt by high temps (eg. snow
 				// golem in nether)
 				if (type.is(WalkersEntityTags.HURT_BY_HIGH_TEMPERATURE)) {
-					Biome biome = level().getBiome(blockPosition()).value();
+					Biome biome = level.getBiome(blockPosition()).value();
 					if (!biome.coldEnoughToSnow(blockPosition())) {
-						player.hurt(level().damageSources().onFire(), 1.0f);
+						player.hurt(level.damageSources().onFire(), 1.0f);
 					}
 				}
 			}
@@ -338,7 +338,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
 	@Inject(method = "tick", at = @At("HEAD"))
 	private void tickWalkers(CallbackInfo ci) {
-		if (!level().isClientSide) {
+		if (!level.isClientSide) {
 			Player player = (Player) (Object) this;
 			LivingEntity shape = PlayerShape.getCurrentShape(player);
 

@@ -18,7 +18,6 @@ import tocraft.walkers.ability.impl.HorseAbility;
 import tocraft.walkers.ability.impl.LlamaAbility;
 import tocraft.walkers.ability.impl.MushroomCowAbility;
 import tocraft.walkers.ability.impl.SheepAbility;
-import tocraft.walkers.ability.impl.SnifferAbility;
 import tocraft.walkers.ability.impl.SnowGolemAbility;
 import tocraft.walkers.ability.impl.WardenAbility;
 import tocraft.walkers.ability.impl.WitchAbility;
@@ -51,7 +50,6 @@ public class AbilityRegistry {
         register(EntityType.WARDEN, new WardenAbility());
         register(EntityType.WOLF, new WolfAbility());
         register(EntityType.SHEEP, new SheepAbility<>());
-        register(EntityType.SNIFFER, new SnifferAbility());
         register(EntityType.CHICKEN, new ChickenAbility<>());
         register(EntityType.MOOSHROOM, new MushroomCowAbility());
         register(EntityType.CAMEL, new HorseAbility<>());

@@ -57,7 +57,7 @@ public class UnlockPackets {
 						PlayerShapeChanger.change2ndShape((ServerPlayer) context.getPlayer(), type);
 						// update Player
 						PlayerShape.updateShapes((ServerPlayer) context.getPlayer(), type,
-								type.create(context.getPlayer().level()));
+								type.create(context.getPlayer().level));
 					}
 
 					// Refresh player dimensions
