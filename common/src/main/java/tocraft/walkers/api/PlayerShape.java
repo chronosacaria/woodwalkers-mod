@@ -1,5 +1,6 @@
 package tocraft.walkers.api;
 
+import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -7,8 +8,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import tocraft.craftedcore.network.NetworkManager;
-import tocraft.walkers.api.variant.ShapeType;
 import tocraft.walkers.impl.PlayerDataProvider;
 import tocraft.walkers.network.NetworkHandler;
 
@@ -25,10 +24,6 @@ public class PlayerShape {
         return ((PlayerDataProvider) player).walkers$getCurrentShape();
     }
 
-    public static ShapeType<?> getCurrentShapeType(Player player) {
-        return ((PlayerDataProvider) player).walkers$getCurrentShapeType();
-    }
-
     /**
      * Sets the shape of the specified player.
      *
@@ -37,7 +32,7 @@ public class PlayerShape {
      *
      * @param entity {@link LivingEntity} new shape for this component, or null to clear
      */
-    public static boolean updateShapes(ServerPlayer player, ShapeType<?> type, LivingEntity entity) {
+    public static boolean updateShapes(ServerPlayer player, LivingEntity entity) {
         return ((PlayerDataProvider) player).walkers$updateShapes(entity);
     }
 
@@ -51,7 +46,7 @@ public class PlayerShape {
 
         // serialize current shape data to tag if it exists
         LivingEntity shape = getCurrentShape(changed);
-        if(shape != null) {
+        if (shape != null) {
             shape.saveWithoutId(entityTag);
         }
 

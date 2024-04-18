@@ -5,7 +5,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.animal.sniffer.Sniffer;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -16,16 +16,16 @@ import tocraft.walkers.ability.ShapeAbility;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SnifferAbility extends ShapeAbility<Sniffer> {
+public class SnifferAbility<T extends Mob> extends ShapeAbility<T> {
 
     @Override
-    public void onUse(Player player, Sniffer shape, Level world) {
+    public void onUse(Player player, T shape, Level world) {
         // Ensures, the player isn't in Water/Lava and touches the ground
         if (player.isInLava() || player.isInWater() || !player.onGround())
             return;
 
         BlockPos playerPos = player.blockPosition();
-        BlockPos blockPos = new BlockPos(playerPos.getX(), playerPos.getY()-1, playerPos.getZ());
+        BlockPos blockPos = new BlockPos(playerPos.getX(), playerPos.getY() - 1, playerPos.getZ());
         List<Block> diggableBlocks = new ArrayList<>();
         diggableBlocks.add(BuiltInRegistries.BLOCK.get(new ResourceLocation("minecraft:dirt")));
         diggableBlocks.add(BuiltInRegistries.BLOCK.get(new ResourceLocation("minecraft:grass_block")));
@@ -44,8 +44,7 @@ public class SnifferAbility extends ShapeAbility<Sniffer> {
                 player.spawnAtLocation(Items.PITCHER_POD);
 
             world.playSound(null, player, SoundEvents.SNIFFER_DIGGING, SoundSource.PLAYERS, 1.0F, (world.random.nextFloat() - world.random.nextFloat()) * 0.2F + 1.0F);
-        }
-        else
+        } else
             world.playSound(null, player, SoundEvents.SNIFFER_DIGGING_STOP, SoundSource.PLAYERS, 1.0F, (world.random.nextFloat() - world.random.nextFloat()) * 0.2F + 1.0F);
     }
 
@@ -56,5 +55,10 @@ public class SnifferAbility extends ShapeAbility<Sniffer> {
 
     private static boolean getRandomBoolean() {
         return Math.random() < 0.5;
+    }
+
+    @Override
+    public int getDefaultCooldown() {
+        return 9600;
     }
 }
